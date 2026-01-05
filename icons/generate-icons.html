@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Master Icon Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        h1 { color: #6366f1; }
+        .icon-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            background: #16213e;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        .icon-item canvas {
+            border-radius: 20%;
+        }
+        .icon-item p {
+            margin: 0.5rem 0 0;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover { background: #4f46e5; }
+        .instructions {
+            background: #16213e;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: left;
+        }
+        .instructions h3 { color: #6366f1; margin-top: 0; }
+        .instructions ol { padding-left: 1.2rem; }
+        .instructions li { margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+    <h1>Flag Master - Icon Generator</h1>
+    <p>Click the button below to generate and download all app icons</p>
+
+    <div class="icon-preview" id="preview"></div>
+
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAllIcons()">Download All Icons</button>
+
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Click "Generate All Icons" to create the icons</li>
+            <li>Click "Download All Icons" to save them to your computer</li>
+            <li>Move the downloaded PNG files to the <code>icons</code> folder</li>
+            <li>Your PWA is now ready for Android!</li>
+        </ol>
+    </div>
+
+    <script>
+        const sizes = [16, 32, 72, 96, 128, 144, 152, 180, 192, 384, 512];
+        const canvases = {};
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const padding = size * 0.1;
+            const innerSize = size - (padding * 2);
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#6366f1');
+            gradient.addColorStop(0.5, '#8b5cf6');
+            gradient.addColorStop(1, '#ec4899');
+
+            // Draw rounded rectangle background
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            const radius = size * 0.2;
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+
+            // Draw globe emoji representation
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🌍', size / 2, size / 2);
+
+            // Add subtle inner glow
+            const glowGradient = ctx.createRadialGradient(
+                size / 2, size / 2, 0,
+                size / 2, size / 2, size / 2
+            );
+            glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+            glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+        }
+
+        function drawIconAlternative(canvas, size) {
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#6366f1');
+            gradient.addColorStop(0.5, '#8b5cf6');
+            gradient.addColorStop(1, '#ec4899');
+
+            // Draw rounded rectangle background
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            const radius = size * 0.2;
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+
+            // Draw a stylized globe
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const globeRadius = size * 0.32;
+
+            // Globe circle
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, globeRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Globe highlight
+            ctx.fillStyle = '#34d399';
+            ctx.beginPath();
+            ctx.arc(centerX - globeRadius * 0.2, centerY - globeRadius * 0.2, globeRadius * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Continent shapes (simplified)
+            ctx.fillStyle = '#059669';
+
+            // Africa-ish
+            ctx.beginPath();
+            ctx.ellipse(centerX + globeRadius * 0.1, centerY, globeRadius * 0.3, globeRadius * 0.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Europe-ish
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY - globeRadius * 0.4, globeRadius * 0.25, globeRadius * 0.2, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Globe outline
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = size * 0.02;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, globeRadius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Latitude lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = size * 0.01;
+            for (let i = -2; i <= 2; i++) {
+                const y = centerY + (i * globeRadius * 0.35);
+                const xOffset = Math.sqrt(Math.max(0, globeRadius * globeRadius - (i * globeRadius * 0.35) * (i * globeRadius * 0.35)));
+                ctx.beginPath();
+                ctx.moveTo(centerX - xOffset, y);
+                ctx.lineTo(centerX + xOffset, y);
+                ctx.stroke();
+            }
+
+            // Longitude line
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, globeRadius * 0.3, globeRadius, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // "F" letter for Flag Master
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.25}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = size * 0.05;
+            ctx.fillText('F', centerX, centerY);
+            ctx.shadowBlur = 0;
+        }
+
+        function generateAllIcons() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                drawIconAlternative(canvas, size);
+                canvases[size] = canvas;
+
+                const item = document.createElement('div');
+                item.className = 'icon-item';
+
+                const displayCanvas = document.createElement('canvas');
+                displayCanvas.width = Math.min(size, 128);
+                displayCanvas.height = Math.min(size, 128);
+                const displayCtx = displayCanvas.getContext('2d');
+                displayCtx.drawImage(canvas, 0, 0, displayCanvas.width, displayCanvas.height);
+
+                item.appendChild(displayCanvas);
+                item.innerHTML += `<p>icon-${size}.png</p>`;
+                preview.appendChild(item);
+            });
+        }
+
+        function downloadAllIcons() {
+            if (Object.keys(canvases).length === 0) {
+                generateAllIcons();
+            }
+
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    const canvas = canvases[size];
+                    const link = document.createElement('a');
+                    link.download = `icon-${size}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }, index * 300);
+            });
+        }
+
+        // Generate on load
+        window.onload = generateAllIcons;
+    </script>
+</body>
+</html>
